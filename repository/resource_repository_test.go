@@ -32,3 +32,17 @@ func TestResourceRepositoryCreate(t *testing.T) {
 		t.Errorf("Failed asserting %s to be %s", actual, expected)
 	}
 }
+
+func TestMain(m *testing.M) {
+	testResult := m.Run()
+
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		t.Errorf("Session Failed %v", err)
+		return
+	}
+	session.DB("readit_test").DropDatabase()
+	session.Close()
+
+	os.Exit(testResult)
+}
