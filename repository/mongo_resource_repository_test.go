@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestResourceRepositoryCreate(t *testing.T) {
+func TestMongoResourceRepositoryCreate(t *testing.T) {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
 		t.Errorf("Session Failed %v", err)
@@ -19,7 +19,7 @@ func TestResourceRepositoryCreate(t *testing.T) {
 	session.SetMode(mgo.Monotonic, true)
 
 	db := session.DB("readit_test")
-	resourceRepo := &ResourceRepository{db}
+	resourceRepo := NewMongoResourceRepository(db)
 	res := &model.Resource{Link: "http://www.google.com"}
 
 	createdRes, err := resourceRepo.Create(res)
