@@ -34,6 +34,29 @@ func TestCreateResourceHandler(t *testing.T) {
 	assert.Equal(t, res.StatusCode, http.StatusCreated)
 
 	contentType := res.Header.Get("Content-Type")
-	assert.Equal(t, contentType, "application/json")
+	assert.Equal(t, "application/json", contentType)
+	mockRepo.AssertExpectations(t)
+}
+func TestListResourcesHandler(t *testing.T) {
+
+	mockRepo := new(repository.MockResourceRepository)
+	mockResources := []*model.Resource{&model.Resource{Link: "http://google.com"}, &model.Resource{Link: "http://yahoo.com"}}
+	mockRepo.On("GetAll").Return(mockResources, nil)
+
+	ts := httptest.NewServer(http.HandlerFunc(listResourcesHandler(mockRepo)))
+	defer ts.Close()
+
+	res, err := http.Get(ts.URL)
+	assert.Nil(t, err)
+
+	actualBytes, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+	assert.Nil(t, err)
+
+	assert.Equal(t, "[{\"id\":\"\",\"link\":\"http://google.com\"},{\"id\":\"\",\"link\":\"http://yahoo.com\"}]", string(actualBytes))
+
+	contentType := res.Header.Get("Content-Type")
+	assert.Equal(t, "application/json", contentType)
+	assert.Equal(t, res.StatusCode, http.StatusOK)
 	mockRepo.AssertExpectations(t)
 }

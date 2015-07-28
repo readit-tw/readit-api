@@ -14,7 +14,15 @@ type MongoResourceRepository struct {
 func NewMongoResourceRepository(db *mgo.Database) *MongoResourceRepository {
 	return &MongoResourceRepository{db: db}
 }
+func (rr *MongoResourceRepository) GetAll() ([]*model.Resource, error) {
+	var resources []*model.Resource
+	err := rr.db.C("resources").Find(nil).All(&resources)
+	if err != nil {
+		return nil, errors.New("Failed to Retrieve")
+	}
+	return resources, nil
 
+}
 func (rr *MongoResourceRepository) Create(resource *model.Resource) (*model.Resource, error) {
 	resource.Id = bson.NewObjectId()
 	err := rr.db.C("resources").Insert(resource)

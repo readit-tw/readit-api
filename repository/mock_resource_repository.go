@@ -13,3 +13,8 @@ func (m *MockResourceRepository) Create(r *model.Resource) (*model.Resource, err
 	args := m.Called(r)
 	return args.Get(0).(*model.Resource), args.Error(1)
 }
+
+func (m *MockResourceRepository) GetAll() ([]*model.Resource, error) {
+	args := m.Called()
+	return args.Get(0).([]*model.Resource), args.Error(1)
+}
