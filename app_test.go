@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/readit-tw/readit-api/model"
+	"github.com/readit-tw/readit-api/repository"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,17 +11,8 @@ import (
 	"testing"
 )
 
-type MockResourceRepository struct {
-	mock.Mock
-}
-
-func (m *MockResourceRepository) Create(r *model.Resource) (*model.Resource, error) {
-	args := m.Called(r)
-	return args.Get(0).(*model.Resource), args.Error(1)
-}
-
 func TestCreateResourceHandler(t *testing.T) {
-	mockRepo := new(MockResourceRepository)
+	mockRepo := new(repository.MockResourceRepository)
 
 	mockResource := &model.Resource{Id: "", Link: "http://www.google.com"}
 	mockRepo.On("Create", mockResource).Return(mockResource, nil)
