@@ -24,9 +24,7 @@ func TestMongoResourceRepositoryGetAll(t *testing.T) {
 }
 
 func TestMongoResourceRepositoryCreate(t *testing.T) {
-
 	res := &model.Resource{Title: "Google", Link: "http://www.google.com"}
-
 	createdRes, err := resourceRepo.Create(res)
 	assert.Nil(t, err)
 	assert.Equal(t, res.Title, createdRes.Title)

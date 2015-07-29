@@ -29,6 +29,8 @@ func listResourcesHandler(rr repository.ResourceRepository) func(http.ResponseWr
 }
 func createResourceHandler(rr repository.ResourceRepository) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
 		resource := &model.Resource{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&resource)
@@ -38,13 +40,36 @@ func createResourceHandler(rr repository.ResourceRepository) func(http.ResponseW
 			return
 		}
 
+		validationErrors := make([]map[string][]string, 0)
+		if resource.Title == "" {
+			e := make(map[string][]string)
+			e["title"] = []string{"title is required"}
+			validationErrors = append(validationErrors, e)
+		}
+		if resource.Link == "" {
+			e := make(map[string][]string)
+			e["link"] = []string{"link is required"}
+			validationErrors = append(validationErrors, e)
+		}
+		if len(validationErrors) != 0 {
+			returnedValidationErrors := make(map[string][]map[string][]string)
+			returnedValidationErrors["errors"] = validationErrors
+			validationErrorsJson, err := json.Marshal(returnedValidationErrors)
+			if err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(validationErrorsJson)
+			return
+		}
+
 		created, err := rr.Create(resource)
 
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
 
 		resourceJson, err := json.Marshal(created)
 		if err != nil {
