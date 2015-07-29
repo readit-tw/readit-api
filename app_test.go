@@ -37,8 +37,8 @@ func TestCreateResourceHandler(t *testing.T) {
 	assert.Equal(t, "application/json", contentType)
 	mockRepo.AssertExpectations(t)
 }
-func TestListResourcesHandler(t *testing.T) {
 
+func TestListResourcesHandler(t *testing.T) {
 	mockRepo := new(repository.MockResourceRepository)
 	mockResources := []*model.Resource{&model.Resource{Link: "http://google.com"}, &model.Resource{Link: "http://yahoo.com"}}
 	mockRepo.On("GetAll").Return(mockResources, nil)

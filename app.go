@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/readit-tw/readit-api/model"
 	"github.com/readit-tw/readit-api/repository"
 	"gopkg.in/mgo.v2"
@@ -66,7 +67,12 @@ func main() {
 	db := session.DB("readit")
 	resourceRepository := repository.NewMongoResourceRepository(db)
 
-	http.HandleFunc("/resources", createResourceHandler(resourceRepository))
-	http.HandleFunc("/", listResourcesHandler(resourceRepository))
+	r := mux.NewRouter()
+
+	r.HandleFunc("/resources", createResourceHandler(resourceRepository)).Methods("POST")
+	r.HandleFunc("/resources", listResourcesHandler(resourceRepository)).Methods("GET")
+
+	http.Handle("/", r)
+
 	http.ListenAndServe(":8080", nil)
 }
