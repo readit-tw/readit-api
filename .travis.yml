@@ -4,3 +4,5 @@ go:
   - 1.4.2
 services:
   - mongodb 
+script:
+  - go test -v ./...
