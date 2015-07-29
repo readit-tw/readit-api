@@ -20,7 +20,7 @@ func TestCreateResourceHandler(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(createResourceHandler(mockRepo)))
 	defer ts.Close()
 
-	request := "{\"id\":\"\",\"link\":\"http://www.google.com\"}"
+	request := "{\"id\":\"\",\"title\":\"\",\"link\":\"http://www.google.com\"}"
 	body := strings.NewReader(request)
 	res, err := http.Post(ts.URL, "application/json", body)
 	assert.Nil(t, err)
@@ -53,7 +53,7 @@ func TestListResourcesHandler(t *testing.T) {
 	res.Body.Close()
 	assert.Nil(t, err)
 
-	assert.Equal(t, "[{\"id\":\"\",\"link\":\"http://google.com\"},{\"id\":\"\",\"link\":\"http://yahoo.com\"}]", string(actualBytes))
+	assert.Equal(t, "[{\"id\":\"\",\"title\":\"\",\"link\":\"http://google.com\"},{\"id\":\"\",\"title\":\"\",\"link\":\"http://yahoo.com\"}]", string(actualBytes))
 
 	contentType := res.Header.Get("Content-Type")
 	assert.Equal(t, "application/json", contentType)

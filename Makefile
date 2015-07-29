@@ -1,3 +1,5 @@
+test:
+	go test ./...
 deploy:
 	GOOS=linux GOARCH=386 go build -o readit-api
 	scp readit-api rd:/tmp/readit-api

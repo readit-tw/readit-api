@@ -11,8 +11,8 @@ import (
 var resourceRepo *MongoResourceRepository
 
 func TestMongoResourceRepositoryGetAll(t *testing.T) {
-	res := &model.Resource{Link: "http://www.google.com"}
-	res1 := &model.Resource{Link: "http://www.yahoo.com"}
+	res := &model.Resource{Title: "Google", Link: "http://www.google.com"}
+	res1 := &model.Resource{Title: "Yahoo", Link: "http://www.yahoo.com"}
 	_, err := resourceRepo.Create(res)
 	assert.Nil(t, err)
 	_, err = resourceRepo.Create(res1)
@@ -25,10 +25,11 @@ func TestMongoResourceRepositoryGetAll(t *testing.T) {
 
 func TestMongoResourceRepositoryCreate(t *testing.T) {
 
-	res := &model.Resource{Link: "http://www.google.com"}
+	res := &model.Resource{Title: "Google", Link: "http://www.google.com"}
 
 	createdRes, err := resourceRepo.Create(res)
 	assert.Nil(t, err)
+	assert.Equal(t, res.Title, createdRes.Title)
 	assert.Equal(t, res.Link, createdRes.Link)
 }
 

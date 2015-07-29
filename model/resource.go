@@ -5,6 +5,7 @@ import (
 )
 
 type Resource struct {
-	Id   bson.ObjectId `bson:"_id" json:"id"`
-	Link string        `json:"link"`
+	Id    bson.ObjectId `bson:"_id" json:"id"`
+	Title string        `json:"title"`
+	Link  string        `json:"link"`
 }
