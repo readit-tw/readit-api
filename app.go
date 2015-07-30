@@ -40,17 +40,8 @@ func createResourceHandler(rr repository.ResourceRepository) func(http.ResponseW
 			return
 		}
 
-		validationErrors := make([]map[string][]string, 0)
-		if resource.Title == "" {
-			e := make(map[string][]string)
-			e["title"] = []string{"title is required"}
-			validationErrors = append(validationErrors, e)
-		}
-		if resource.Link == "" {
-			e := make(map[string][]string)
-			e["link"] = []string{"link is required"}
-			validationErrors = append(validationErrors, e)
-		}
+		validationErrors := resource.Validate()
+
 		if len(validationErrors) != 0 {
 			returnedValidationErrors := make(map[string][]map[string][]string)
 			returnedValidationErrors["errors"] = validationErrors

@@ -9,3 +9,21 @@ type Resource struct {
 	Title string        `json:"title"`
 	Link  string        `json:"link"`
 }
+
+func (r *Resource) Validate() []map[string][]string {
+
+	validationErrors := make([]map[string][]string, 0)
+	if r.Title == "" {
+		e := make(map[string][]string)
+		e["title"] = []string{"title is required"}
+		validationErrors = append(validationErrors, e)
+	}
+	if r.Link == "" {
+		e := make(map[string][]string)
+		e["link"] = []string{"link is required"}
+		validationErrors = append(validationErrors, e)
+	}
+
+	return validationErrors
+
+}
