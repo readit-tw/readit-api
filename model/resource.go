@@ -13,12 +13,12 @@ type Resource struct {
 func (r *Resource) Validate() []map[string][]string {
 
 	validationErrors := make([]map[string][]string, 0)
-	if r.Title == "" {
+	if r.Title == " " || r.Title == "" {
 		e := make(map[string][]string)
 		e["title"] = []string{"title is required"}
 		validationErrors = append(validationErrors, e)
 	}
-	if r.Link == "" {
+	if r.Link == " " || r.Link == "" {
 		e := make(map[string][]string)
 		e["link"] = []string{"link is required"}
 		validationErrors = append(validationErrors, e)
