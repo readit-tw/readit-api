@@ -87,6 +87,7 @@ func main() {
 
 	r.HandleFunc("/resources", createResourceHandler(resourceRepository)).Methods("POST")
 	r.HandleFunc("/resources", listResourcesHandler(resourceRepository)).Methods("GET")
+	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("../readit-web"))))
 
 	http.Handle("/", r)
 
