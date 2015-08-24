@@ -8,6 +8,8 @@ import (
 	"gopkg.in/mgo.v2"
 	"log"
 	"net/http"
+	"strings"
+	"io/ioutil"
 )
 
 func listResourcesHandler(rr repository.ResourceRepository) func(http.ResponseWriter, *http.Request) {
@@ -41,6 +43,7 @@ func createResourceHandler(rr repository.ResourceRepository) func(http.ResponseW
 		}
 
 		validationErrors := resource.Validate()
+		
 
 		if len(validationErrors) != 0 {
 			returnedValidationErrors := make(map[string][]map[string][]string)
@@ -55,14 +58,29 @@ func createResourceHandler(rr repository.ResourceRepository) func(http.ResponseW
 			return
 		}
 
+		// Get the content type from source link
+		linkResp, errorContentType := http.Get(resource.Link) 
+	    if errorContentType == nil { 
+	        contentType := linkResp.Header.Get("Content-Type") 
+	        resource.Type = contentType // default, assign header content-type
+	        if strings.Contains(contentType, "text/html") {
+	        	bodyContents, bodyErr := ioutil.ReadAll(linkResp.Body)
+	        	if bodyErr == nil {
+	        		if strings.Contains(string(bodyContents), "application/x-shockwave-flash") {
+	        			 resource.Type = "application/x-shockwave-flash"
+	        		}
+	        	}
+	        } 
+	    }
+	    
 		created, err := rr.Create(resource)
-
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
 		resourceJson, err := json.Marshal(created)
+		
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return

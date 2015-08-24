@@ -8,6 +8,7 @@ type Resource struct {
 	Id    bson.ObjectId `bson:"_id" json:"id"`
 	Title string        `json:"title"`
 	Link  string        `json:"link"`
+	Type  string 		`json:"type"`
 }
 
 func (r *Resource) Validate() []map[string][]string {
