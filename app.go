@@ -12,6 +12,29 @@ import (
 	"io/ioutil"
 )
 
+func searchListResourcesHandler(rr repository.ResourceRepository) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+    	term := vars["term"]
+    	
+    	log.Printf("term:" + term)
+    	
+		resources, err := rr.SearchByTerm(term)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		resourcesJson, err := json.Marshal(resources)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(resourcesJson)
+	}
+}
+
 func listResourcesHandler(rr repository.ResourceRepository) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -105,6 +128,7 @@ func main() {
 
 	r.HandleFunc("/resources", createResourceHandler(resourceRepository)).Methods("POST")
 	r.HandleFunc("/resources", listResourcesHandler(resourceRepository)).Methods("GET")
+	r.HandleFunc("/resources/{term}", searchListResourcesHandler(resourceRepository)).Methods("GET")
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("../readit-web"))))
 
 	http.Handle("/", r)

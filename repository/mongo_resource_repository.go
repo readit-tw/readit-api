@@ -5,6 +5,7 @@ import (
 	"github.com/readit-tw/readit-api/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 )
 
 type MongoResourceRepository struct {
@@ -14,6 +15,19 @@ type MongoResourceRepository struct {
 func NewMongoResourceRepository(db *mgo.Database) *MongoResourceRepository {
 	return &MongoResourceRepository{db: db}
 }
+func (rr *MongoResourceRepository) SearchByTerm(term string) ([]*model.Resource, error) {
+	log.Printf("db term:" + term)
+	var resources []*model.Resource
+	
+	err := rr.db.C("resources").Find(bson.M{"title": bson.RegEx{term, ""}}).All(&resources)
+	if err != nil {
+		return nil, errors.New("Failed to Retrieve")
+		log.Printf("Failed to Retrieve search result for :" + term)
+	}
+	log.Println("search Results All: ", resources)
+	return resources, nil
+}
+
 func (rr *MongoResourceRepository) GetAll() ([]*model.Resource, error) {
 	var resources []*model.Resource
 	err := rr.db.C("resources").Find(nil).All(&resources)
@@ -23,6 +37,8 @@ func (rr *MongoResourceRepository) GetAll() ([]*model.Resource, error) {
 	return resources, nil
 
 }
+
+
 func (rr *MongoResourceRepository) Create(resource *model.Resource) (*model.Resource, error) {
 	resource.Id = bson.NewObjectId()
 	err := rr.db.C("resources").Insert(resource)
