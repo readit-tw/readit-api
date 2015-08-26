@@ -40,6 +40,7 @@ func (rr *MongoResourceRepository) GetAll() ([]*model.Resource, error) {
 
 
 func (rr *MongoResourceRepository) Create(resource *model.Resource) (*model.Resource, error) {
+	
 	resource.Id = bson.NewObjectId()
 	err := rr.db.C("resources").Insert(resource)
 	if err != nil {

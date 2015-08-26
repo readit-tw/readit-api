@@ -9,6 +9,8 @@ type Resource struct {
 	Title string        `json:"title"`
 	Link  string        `json:"link"`
 	Type  string 		`json:"type"`
+	Tags  []string		`bson:"-" json:"tags"`// Only for mapping UI/Client tags -> It will always omitted while db commit/persist
+	Tag	[]bson.ObjectId `bson:"tag_id,omitempty"`
 }
 
 func (r *Resource) Validate() []map[string][]string {

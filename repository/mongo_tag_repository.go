@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
+	"fmt"
 )
 
 type MongoTagRepository struct {
@@ -14,6 +15,18 @@ type MongoTagRepository struct {
 
 func NewMongoTagRepository(db *mgo.Database) *MongoTagRepository {
 	return &MongoTagRepository{db: db}
+}
+
+func (rr *MongoTagRepository) GetByName(name string) (*model.Tag, error) {
+	log.Printf("tag name:" + name)
+	var tag *model.Tag
+	
+	err := rr.db.C("tags").Find(bson.M{"name": name}).One(&tag)
+	if err != nil {
+		return nil, errors.New("Failed to Retrieve")
+		log.Printf("Failed to Retrieve search result for :" + name)
+	}
+	return tag, nil
 }
 
 func (rr *MongoTagRepository) GetAll() ([]*model.Tag, error) {
@@ -40,10 +53,29 @@ func (rr *MongoTagRepository) SearchByTerm(term string) ([]*model.Tag, error) {
 }
 
 func (rr *MongoTagRepository) Create(tag *model.Tag) (*model.Tag, error) {
-	tag.Id = bson.NewObjectId()
-	err := rr.db.C("tags").Insert(tag)
+	
+	log.Printf("tag going to creation:" + tag.Name)
+	
+	var tagToCreate *model.Tag
+	err := rr.db.C("tags").Find(bson.M{"name": tag.Name}).One(&tagToCreate)
+	log.Printf("is tag found  ?" )
+	
+	if err ==nil && tagToCreate != nil {
+		log.Printf("tag creation : tag found !" )
+		return tagToCreate, nil
+	}
 	if err != nil {
-		return nil, errors.New("Failed to Insert ")
+		log.Printf("tag creation : error found :(" )
+		fmt.Print(err)
+		// nil, errors.New("Failed to Insert")
+	}
+	
+	log.Printf("new tag creation")
+	
+	tag.Id = bson.NewObjectId()
+	err = rr.db.C("tags").Insert(tag)
+	if err != nil {
+		return nil, errors.New("Failed to Insert")
 	}
 
 	log.Printf("tag creation:" + tag.Name)
