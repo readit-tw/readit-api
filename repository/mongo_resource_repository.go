@@ -19,12 +19,12 @@ func (rr *MongoResourceRepository) SearchByTerm(term string) ([]*model.Resource,
 	log.Printf("db term:" + term)
 	var resources []*model.Resource
 	
+	//http://stackoverflow.com/questions/3305561/how-to-query-mongodb-with-like
 	err := rr.db.C("resources").Find(bson.M{"title": bson.RegEx{term, ""}}).All(&resources)
 	if err != nil {
 		return nil, errors.New("Failed to Retrieve")
 		log.Printf("Failed to Retrieve search result for :" + term)
 	}
-	log.Println("search Results All: ", resources)
 	return resources, nil
 }
 

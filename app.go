@@ -113,6 +113,47 @@ func createResourceHandler(rr repository.ResourceRepository) func(http.ResponseW
 	}
 }
 
+func listTagsHandler(rr repository.TagRepository) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		tags, err := rr.GetAll()
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		tagsJson, err := json.Marshal(tags)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(tagsJson)
+	}
+}
+
+func searchListTagsHandler(rr repository.TagRepository) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+    	term := vars["term"]
+    	
+    	log.Printf("term:" + term)
+    	
+		tags, err := rr.SearchByTerm(term)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		tagsJson, err := json.Marshal(tags)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(tagsJson)
+	}
+}
+
 func main() {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
@@ -123,12 +164,19 @@ func main() {
 	session.SetMode(mgo.Monotonic, true)
 	db := session.DB("readit")
 	resourceRepository := repository.NewMongoResourceRepository(db)
+	tagRepository := repository.NewMongoTagRepository(db)
 
 	r := mux.NewRouter()
 
+	// Resource
 	r.HandleFunc("/resources", createResourceHandler(resourceRepository)).Methods("POST")
 	r.HandleFunc("/resources", listResourcesHandler(resourceRepository)).Methods("GET")
 	r.HandleFunc("/resources/{term}", searchListResourcesHandler(resourceRepository)).Methods("GET")
+	
+	// Tag
+	r.HandleFunc("/tags", listTagsHandler(tagRepository)).Methods("GET")
+	r.HandleFunc("/tags/{term}", searchListTagsHandler(tagRepository)).Methods("GET")
+	
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("../readit-web"))))
 
 	http.Handle("/", r)
