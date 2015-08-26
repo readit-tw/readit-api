@@ -44,7 +44,7 @@ func (rr *MongoTagRepository) SearchByTerm(term string) ([]*model.Tag, error) {
 	var tags []*model.Tag
 	
 	//http://stackoverflow.com/questions/3305561/how-to-query-mongodb-with-like
-	err := rr.db.C("tags").Find(bson.M{"name": bson.RegEx{term, ""}}).All(&tags)
+	err := rr.db.C("tags").Find(bson.M{"name": bson.RegEx{term, "i"}}).All(&tags)
 	if err != nil {
 		return nil, errors.New("Failed to Retrieve")
 		log.Printf("Failed to Retrieve search result for :" + term)
@@ -58,10 +58,8 @@ func (rr *MongoTagRepository) Create(tag *model.Tag) (*model.Tag, error) {
 	
 	var tagToCreate *model.Tag
 	err := rr.db.C("tags").Find(bson.M{"name": tag.Name}).One(&tagToCreate)
-	log.Printf("is tag found  ?" )
 	
 	if err ==nil && tagToCreate != nil {
-		log.Printf("tag creation : tag found !" )
 		return tagToCreate, nil
 	}
 	if err != nil {
@@ -69,17 +67,13 @@ func (rr *MongoTagRepository) Create(tag *model.Tag) (*model.Tag, error) {
 		fmt.Print(err)
 		// nil, errors.New("Failed to Insert")
 	}
-	
-	log.Printf("new tag creation")
-	
+		
 	tag.Id = bson.NewObjectId()
 	err = rr.db.C("tags").Insert(tag)
 	if err != nil {
 		return nil, errors.New("Failed to Insert")
 	}
 
-	log.Printf("tag creation:" + tag.Name)
-	
 	var createdTag *model.Tag
 	err = rr.db.C("tags").Find(bson.M{"_id": tag.Id}).One(&createdTag)
 	if err != nil {

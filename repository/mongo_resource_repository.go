@@ -16,11 +16,10 @@ func NewMongoResourceRepository(db *mgo.Database) *MongoResourceRepository {
 	return &MongoResourceRepository{db: db}
 }
 func (rr *MongoResourceRepository) SearchByTerm(term string) ([]*model.Resource, error) {
-	log.Printf("db term:" + term)
 	var resources []*model.Resource
 	
 	//http://stackoverflow.com/questions/3305561/how-to-query-mongodb-with-like
-	err := rr.db.C("resources").Find(bson.M{"title": bson.RegEx{term, ""}}).All(&resources)
+	err := rr.db.C("resources").Find(bson.M{"title": bson.RegEx{term, "i"}}).All(&resources)
 	if err != nil {
 		return nil, errors.New("Failed to Retrieve")
 		log.Printf("Failed to Retrieve search result for :" + term)

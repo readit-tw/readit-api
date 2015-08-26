@@ -56,15 +56,12 @@ func listResourcesHandler(rr repository.ResourceRepository) func(http.ResponseWr
 func createResourceHandler(rr repository.ResourceRepository, tr repository.TagRepository) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		
-		log.Printf("create request body term:")
 		w.Header().Set("Content-Type", "application/json")
 
 		resource := &model.Resource{}
 		decoder := json.NewDecoder(r.Body)
 		err := decoder.Decode(&resource)
 		
-		log.Printf("request body term:")
-
 		if err != nil {
 			http.Error(w, "Bad JSON Request", http.StatusBadRequest)
 			return
